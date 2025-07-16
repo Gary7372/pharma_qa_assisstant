@@ -26,4 +26,4 @@ def get_retriever():
     )
 
     # Return retriever that yields full Document objects (with metadata)
-    return db.as_retriever(search_type="similarity", k=5)
+    return db.as_retriever(search_type="similarity", k=10)
