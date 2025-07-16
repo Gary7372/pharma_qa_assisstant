@@ -6,3 +6,4 @@ sentence-transformers
 pydantic
 faiss-cpu
 python-dotenv
+langchain-community
