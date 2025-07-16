@@ -1,28 +1,23 @@
-#.venv\Scripts\python.exe -m streamlit run app.py
-import os
-#from dotenv import load_dotenv
-#load_dotenv()
 import streamlit as st
-
 from graph_builder import build_graph
+from langchain.schema import Document
 
-# Initialize graph once
-graph = build_graph()
+st.set_page_config(page_title="💊 Pharma QA Assistant", layout="wide")
+st.title("💊 Pharma QA Assistant")
 
-st.set_page_config(page_title="Pharma QA Assistant", layout="wide")
-st.title("💊 Pharmaceutical QA Assistant")
-st.write("Ask a question based on your parsed regulatory or clinical documents.")
+query = st.text_input("Enter your medical/pharmaceutical question:")
 
-# Text input
-query = st.text_area("Enter your question:", height=100)
+if query:
+    with st.spinner("Retrieving and analyzing documents..."):
+        app = build_graph()
+        result = app.invoke({"query": query})
 
-if st.button("Submit Question") and query.strip():
-    with st.spinner("Analyzing documents..."):
-        try:
-            result = graph.invoke({"query": query})
-            st.success("Answer generated successfully!")
-            st.subheader("🧠 Answer:")
-            st.markdown(result["answer"])
+        st.markdown("## ✅ Answer")
+        st.write(result["answer"])
 
-        except Exception as e:
-            st.error(f"Error: {e}")
+        st.markdown("## 📄 Retrieved Document Chunks")
+        documents: list[Document] = result["documents"]
+        for i, doc in enumerate(documents, 1):
+            with st.expander(f"Chunk {i} — Page {doc.metadata.get('page', '?')}"):
+                st.markdown(doc.page_content)
+                st.caption(f"📎 Metadata: {doc.metadata}")
